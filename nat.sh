@@ -44,12 +44,17 @@ service dnat start > /dev/null 2>&1
 
 
 ## 获取本机地址
+AllIP=$(ip -o -4 addr list | grep -Ev '\s(docker|lo)' | awk '{print $4}' | cut -d/ -f1)
+echo "网卡IP有 $AllIP"
+
 localIP=$(ip -o -4 addr list | grep -Ev '\s(docker|lo)' | awk '{print $4}' | cut -d/ -f1 | grep -Ev '(^127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$)|(^172\.1[6-9]{1}[0-9]{0,1}\.[0-9]{1,3}\.[0-9]{1,3}$)|(^172\.2[0-9]{1}[0-9]{0,1}\.[0-9]{1,3}\.[0-9]{1,3}$)|(^172\.3[0-1]{1}[0-9]{0,1}\.[0-9]{1,3}\.[0-9]{1,3}$)')
 if [ "${localIP}" = "" ]; then
         localIP=$(ip -o -4 addr list | grep -Ev '\s(docker|lo)' | awk '{print $4}' | cut -d/ -f1|head -n 1 )
 fi
+
 echo "本脚本修改为允许10头|192头的内网IP"
 echo "获取的本机IP是$localIP"
+
 rmIptablesNat(){
     #删除旧的中转规则
         local arr1=(`iptables -L PREROUTING -n -t nat --line-number |grep DNAT|grep "dpt:$1 "|sort -r|awk '{print $1,$3,$9}'|tr " " ":"|tr "\n" " "`)
