@@ -42,7 +42,7 @@ service dnat stop > /dev/null 2>&1
 service dnat start > /dev/null 2>&1
 }
 
-
+echo "本脚本修改为允许10头|192头的内网IP"
 ## 获取本机地址
 AllIP=$(ip -o -4 addr list | grep -Ev '\s(docker|lo)' | awk '{print $4}' | cut -d/ -f1)
 echo "网卡IPv4有"
@@ -53,7 +53,6 @@ if [ "${localIP}" = "" ]; then
         localIP=$(ip -o -4 addr list | grep -Ev '\s(docker|lo)' | awk '{print $4}' | cut -d/ -f1|head -n 1 )
 fi
 
-echo "本脚本修改为允许10头|192头的内网IP"
 echo "获取的本机IP是$localIP"
 
 rmIptablesNat(){
